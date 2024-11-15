@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table"
 import { ArrowUpDown } from 'lucide-react'
+import { NeynarSignIn } from '@/components/NeynarSignIn'
 
 type Project = {
   id: number
@@ -34,6 +35,7 @@ const initialProjects: Project[] = [
 export default function ProjectList() {
   const [projects, setProjects] = useState<Project[]>(initialProjects)
   const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('asc')
+  const [authenticatedUser, setAuthenticatedUser] = useState<{ signerUuid: string; fid: string } | null>(null)
 
   const handleSort = () => {
     const sortedProjects = [...projects].sort((a, b) => {
@@ -47,12 +49,20 @@ export default function ProjectList() {
     setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc')
   }
 
+  const handleSignInSuccess = (data: { signerUuid: string; fid: string }) => {
+    console.log("Sign-in success:", data)
+    setAuthenticatedUser(data)
+    // Add your login logic here
+  }
+
   return (
     <div className="container mx-auto px-4 py-8">
       <div className="flex justify-end mb-4">
-        <Button variant="outline" className="bg-white text-black border-black hover:bg-gray-100">
-          Farcaster Login
-        </Button>
+        <NeynarSignIn 
+          clientId={process.env.NEXT_PUBLIC_NEYNAR_CLIENT_ID!}
+          onSuccess={handleSignInSuccess}
+          theme="light"
+        />
       </div>
       <Table>
         <TableHeader>
