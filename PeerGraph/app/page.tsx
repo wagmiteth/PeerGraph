@@ -67,7 +67,7 @@ export default function ProjectList() {
             <TableHead className="w-[200px]">Project Name</TableHead>
             <TableHead className="text-right">
               <Button variant="ghost" onClick={handleSort} className="hover:bg-gray-100">
-                Followers in Network
+                Peer Followers
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
