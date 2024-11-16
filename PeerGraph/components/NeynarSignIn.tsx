@@ -3,7 +3,7 @@ import { useEffect } from 'react'
 
 interface NeynarSignInProps {
   clientId: string;
-  onSuccess: (data: { signerUuid: string; fid: string }) => void;
+  onSuccess: (data: NeynarSignInResponse) => void;
   theme?: 'dark' | 'light';
 }
 
@@ -16,7 +16,10 @@ export function NeynarSignIn({ clientId, onSuccess, theme = 'light' }: NeynarSig
     document.body.appendChild(script)
 
     // Add callback to window object
-    window.onSignInSuccess = onSuccess
+    window.onSignInSuccess = (data) => {
+      console.log('Raw Neynar sign-in data:', data); // Debug log
+      onSuccess(data);
+    }
 
     return () => {
       document.body.removeChild(script)
