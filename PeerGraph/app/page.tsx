@@ -157,8 +157,9 @@ export default function ProjectList() {
         </TableBody>
       </Table>
 
-      {/* <NeynarFollowers /> */}
-      <DuneFollowerQuery />
+      {authenticatedUser?.fid && (
+        <DuneFollowerQuery fid={parseInt(authenticatedUser.fid)} />
+      )}
     </div>
   )
 }

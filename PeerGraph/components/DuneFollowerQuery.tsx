@@ -1,14 +1,19 @@
 import { useState, useEffect } from 'react';
 import { QueryParameter, DuneClient } from "@duneanalytics/client-sdk";
 
-function DuneQueryComponent() {
+function DuneQueryComponent({ fid }: { fid: number }) {
     const [queryResults, setQueryResults] = useState<any>(null);
 
     useEffect(() => {
         // Define async function inside useEffect
         async function fetchData() {
             const dune = new DuneClient(process.env.NEXT_PUBLIC_DUNE_API_KEY ?? "NH79oReukMRCELkXcPsKzTsofjmsfrNp");
-            const results = await dune.getLatestResult({ queryId: 4290058 });
+            const parameter: QueryParameter = {
+                key: 'fid',
+                type: 'Number',
+                value: fid
+            };
+            const results = await dune.getLatestResult({ queryId: 4290058, parameters: [parameter] });
             setQueryResults(results);
         }
 
