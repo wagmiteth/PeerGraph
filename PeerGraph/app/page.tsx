@@ -20,16 +20,13 @@ type Project = {
 }
 
 const initialProjects: Project[] = [
-  { id: 1, name: "Project Alpha", followers: 1200 },
-  { id: 2, name: "Project Beta", followers: 980 },
-  { id: 3, name: "Project Gamma", followers: 1500 },
-  { id: 4, name: "Project Delta", followers: 750 },
-  { id: 5, name: "Project Epsilon", followers: 2000 },
-  { id: 6, name: "Project Zeta", followers: 1100 },
-  { id: 7, name: "Project Eta", followers: 890 },
-  { id: 8, name: "Project Theta", followers: 1300 },
-  { id: 9, name: "Project Iota", followers: 670 },
-  { id: 10, name: "Project Kappa", followers: 1800 },
+  { id: 1, name: "Arbitrum", followers: 1200 },
+  { id: 2, name: "Optimism", followers: 980 },
+  { id: 3, name: "Polygon", followers: 1500 },
+  { id: 4, name: "Base", followers: 750 },
+  { id: 5, name: "StarkNet", followers: 2000 },
+  { id: 6, name: "zkSync", followers: 1100 },
+  { id: 7, name: "Mantle", followers: 890 }
 ]
 
 export default function ProjectList() {
@@ -70,7 +67,7 @@ export default function ProjectList() {
             <TableHead className="w-[200px]">Project Name</TableHead>
             <TableHead className="text-right">
               <Button variant="ghost" onClick={handleSort} className="hover:bg-gray-100">
-                Followers
+                Followers in Network
                 <ArrowUpDown className="ml-2 h-4 w-4" />
               </Button>
             </TableHead>
