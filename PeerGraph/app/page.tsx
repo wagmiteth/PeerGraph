@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/table"
 import { ArrowUpDown } from 'lucide-react'
 import { NeynarSignIn } from '@/components/NeynarSignIn'
+import DuneFollowerQuery from '@/components/DuneFollowerQuery'
 
 type Project = {
   id: number
@@ -155,6 +156,9 @@ export default function ProjectList() {
           ))}
         </TableBody>
       </Table>
+
+      {/* <NeynarFollowers /> */}
+      <DuneFollowerQuery />
     </div>
   )
 }
