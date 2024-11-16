@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Zoomable Node Graph</title>
+    <style>
+        body {
+            display: flex;
+            align-items: flex-start;
+            margin: 0;
+            padding: 20px;
+        }
+        #editor {
+            width: 300px;
+            height: 600px;
+            margin-right: 20px;
+            font-family: monospace;
+        }
+        .node {
+            stroke: #fff;
+            stroke-width: 1.5px;
+            cursor: pointer;
+        }
+        .link {
+            stroke: #999;
+            stroke-opacity: 0.6;
+        }
+        .node-image {
+            clip-path: circle(25%);
+        }
+    </style>
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+</head>
+<body>
+    <div>
+        <textarea id="editor">
+{
+    "users": [
+        {
+            "fid": 5650,
+            "custodyAddress": "0xadd746be46ff36f10c81d6e3ba282537f4c68077",
+            "username": "vitalik.eth",
+            "displayName": "Vitalik Buterin",
+            "pfp": { "url": "https://imageio.forbes.com/specials-images/imageserve/609c5c514fddca80f735a62f/0x0.jpg?format=jpg&height=900&width=1600&fit=bounds" },
+            "followerCount": 14769,
+            "followingCount": 70,
+            "verifications": ["0xd8da6bf26964af9d7eed9e03e53415d37aa96045"],
+            "activeStatus": "active",
+            "following": [
+                {
+                    "fid": 6227,
+                    "custodyAddress": "0x35b92ea9c3819766ec1fff8ddecec69028b0ac42",
+                    "username": "1ekinci.eth",
+                    "displayName": "Joseph",
+                    "pfp": { "url": "https://i.imgur.com/smbrNPw.jpg" },
+                    "followerCount": 670,
+                    "followingCount": 660,
+                    "verifications": ["0x5f57c686bdbc03242c8fa723b80f0a6cdea79546"],
+                    "activeStatus": "active",
+                    "timestamp": "2023-11-14T04:13:11.000Z"
+                },
+                {
+                    "fid": 280,
+                    "custodyAddress": "0xd05d60b5762728466b43dd94ba882d050b60af67",
+                    "username": "vrypan.eth",
+                    "displayName": "vrypan.eth",
+                    "pfp": { "url": "https://i.imgur.com/jmXEW3I.png" },
+                    "followerCount": 1296,
+                    "followingCount": 493,
+                    "verifications": ["0x8b0573d1c80362db589eda39c2e30f5190d7eb51", "0x93c620d2af377c6c37e3e3c1d3e065eb04b08ae2"],
+                    "activeStatus": "active",
+                    "timestamp": "2023-11-14T01:37:40.000Z"
+                }
+            ]
+        },
+        {
+            "fid": 5651,
+            "custodyAddress": "0xAddrsasdasd",
+            "username": "cyan.eth",
+            "displayName": "cyan",
+            "pfp": { "url": "https://ih1.redbubble.net/image.1943346000.5436/st,small,507x507-pad,600x600,f8f8f8.u1.jpg" },
+            "followerCount": 14769,
+            "followingCount": 70,
+            "verifications": ["0xd8da6bf26964af9d7eed9e03e53415d37aa96045"],
+            "activeStatus": "active",
+            "following": [
+                {
+                    "fid": 6227,
+                    "custodyAddress": "0x35b92ea9c3819766ec1fff8ddecec69028b0ac42",
+                    "username": "1ekinci.eth",
+                    "displayName": "Joseph",
+                    "pfp": { "url": "https://i.imgur.com/smbrNPw.jpg" },
+                    "followerCount": 670,
+                    "followingCount": 660,
+                    "verifications": ["0x5f57c686bdbc03242c8fa723b80f0a6cdea79546"],
+                    "activeStatus": "active",
+                    "timestamp": "2023-11-14T04:13:11.000Z"
+                },
+                {
+                    "fid": 281,
+                    "custodyAddress": "0xd05d60b5762728466b43dd94ba882d050b60af67",
+                    "username": "satoshi.eth",
+                    "displayName": "satoshi.eth",
+                    "pfp": { "url": "https://i.imgur.com/jmXEW3I.png" },
+                    "followerCount": 1296,
+                    "followingCount": 493,
+                    "verifications": ["0x8b0573d1c80362db589eda39c2e30f5190d7eb51", "0x93c620d2af377c6c37e3e3c1d3e065eb04b08ae2"],
+                    "activeStatus": "active",
+                    "timestamp": "2023-11-14T01:37:40.000Z"
+                }
+            ]
+        }
+    ]
+}
+        </textarea>
+        <button onclick="updateGraph()">Update Graph</button>
+    </div>
+    <svg width="800" height="600"></svg>
+    <script>
+        function updateGraph() {
+            const svg = d3.select("svg");
+            svg.selectAll("*").remove();
+
+            let data;
+            try {
+                data = JSON.parse(document.getElementById('editor').value);
+            } catch (e) {
+                alert("Invalid JSON");
+                return;
+            }
+
+            const nodeMap = new Map();
+            const links = [];
+
+            data.users.forEach(user => {
+                if (!nodeMap.has(user.fid)) {
+                    nodeMap.set(user.fid, {
+                        id: user.fid,
+                        displayName: user.displayName,
+                        pfp: user.pfp ? user.pfp.url : null
+                    });
+                }
+
+                user.following.forEach(follow => {
+                    if (!nodeMap.has(follow.fid)) {
+                        nodeMap.set(follow.fid, {
+                            id: follow.fid,
+                            displayName: follow.displayName,
+                            pfp: follow.pfp.url
+                        });
+                    }
+                    links.push({
+                        source: user.fid,
+                        target: follow.fid
+                    });
+                });
+            });
+
+            const nodes = Array.from(nodeMap.values());
+
+            const width = +svg.attr("width");
+            const height = +svg.attr("height");
+
+            const container = svg.append("g");
+
+            const zoom = d3.zoom()
+                .scaleExtent([0.5, 2])
+                .on("zoom", (event) => {
+                    container.attr("transform", event.transform);
+                });
+
+            svg.call(zoom);
+
+            const simulation = d3.forceSimulation(nodes)
+                .force("link", d3.forceLink(links).distance(200).id(d => d.id))
+                .force("charge", d3.forceManyBody().strength(-500))
+                .force("center", d3.forceCenter(width / 2, height / 2));
+
+            const link = container.append("g")
+                .attr("class", "links")
+                .selectAll("line")
+                .data(links)
+                .enter().append("line")
+                .attr("class", "link");
+
+            const node = container.append("g")
+                .attr("class", "nodes")
+                .selectAll("g")
+                .data(nodes)
+                .enter().append("g")
+                .call(d3.drag()
+                    .on("start", dragstarted)
+                    .on("drag", dragged)
+                    .on("end", dragended));
+
+            node.append("image")
+                .attr("class", "node-image")
+                .attr("xlink:href", d => d.pfp)
+                .attr("x", -25)
+                .attr("y", -25)
+                .attr("width", 50)
+                .attr("height", 50);
+
+            node.append("text")
+                .attr("dx", 30)
+                .attr("dy", ".35em")
+                .text(d => d.displayName);
+
+            simulation.on("tick", () => {
+                link
+                    .attr("x1", d => d.source.x)
+                    .attr("y1", d => d.source.y)
+                    .attr("x2", d => d.target.x)
+                    .attr("y2", d => d.target.y);
+
+                node
+                    .attr("transform", d => `translate(${d.x},${d.y})`);
+            });
+
+            function dragstarted(event, d) {
+                if (!event.active) simulation.alphaTarget(0.3).restart();
+                d.fx = d.x;
+                d.fy = d.y;
+            }
+
+            function dragged(event, d) {
+                d.fx = event.x;
+                d.fy = event.y;
+            }
+
+            function dragended(event, d) {
+                if (!event.active) simulation.alphaTarget(0);
+                d.fx = null;
+                d.fy = null;
+            }
+        }
+
+        updateGraph();
+    </script>
+</body>
+</html>
