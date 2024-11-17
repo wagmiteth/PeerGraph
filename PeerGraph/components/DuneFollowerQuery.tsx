@@ -13,6 +13,19 @@ function DuneQueryComponent({ fid }: { fid: number }) {
                 type: 'Number',
                 value: fid
             };
+            /* SQL Query:
+            -- List all followers of followers of an account
+            WITH t_follower AS (
+                SELECT ln.target_fid AS follower
+                FROM dune.neynar.dataset_farcaster_links ln
+                WHERE
+                    ln.fid = {{s_fid}}
+                    AND ln.type = 'follow'
+            )
+            SELECT target_fid
+            FROM dune.neynar.dataset_farcaster_links ln
+            WHERE ln.fid IN (SELECT follower FROM t_follower);
+            */
             const results = await dune.getLatestResult({ queryId: 4290058, parameters: [parameter] });
             setQueryResults(results);
         }
@@ -22,9 +35,6 @@ function DuneQueryComponent({ fid }: { fid: number }) {
     }, []); // Empty dependency array means this runs once on mount
 
     return (
-        // <div>
-        //     {queryResults && JSON.stringify(queryResults, null, 2)}
-        // </div>
         <div className="overflow-x-auto">
             {queryResults && queryResults.result?.rows && (
                 <table className="min-w-full table-auto border-collapse">
